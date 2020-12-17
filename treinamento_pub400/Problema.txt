@@ -1,0 +1,39 @@
+Producer:
+	Excel de Entrada com 03 colunas
+		{NOME, COMANDO, PARAMETRO}
+
+		NOME : 1-7 caraceteres
+		COMANDO : [Adicionar, Modificar, Remover]
+		PARAMETRO : O que irá no campo `data` no `IBM i`.
+			obs: Nào é necessário PARAMETRO caso COMANDO == `Remover`
+
+Consumer:
+	Abrir Aplicativo 
+	Fazer Login
+
+	# PesquisaItem
+		Validar se o dado que veio é suficiente/correto
+
+	Acessar a(s) tela(s)
+	Realizar as tarefas/modificações
+	Reportar para Dashboard
+
+
+
+Config.ini (+info, slide 25 treinamento_inicial.pptx)
+	EM AMBOS
+	[CONTROLE]nomeProcesso
+	[CONTROLE]baseDir
+	[CONEXAO]ipBrainDev, ipBpmDev
+	[CONTROLE]raceMode=racing ; racing=Online, training=Offline
+	[CONTROLE]userId, passwordId ; necessário se estiver raceMode=racing
+
+	PRODUCER
+		[CONTROLE]mode=multiproducer
+		[CONTROLE]multiProducer=[#1 Step do Alvo] ; =PesquisaItem
+		[CONTROLE]multiProducerTo=[DiagramaDoConsumer] ; =PortoSeguroGeradorCobrancaDeMultasRepique
+
+	CONSUMER
+		[CONTROLE]mode=consumer
+		[CONTROLE]steps=[#Step no BPM na qual a tarefa inicial se encontra] ; =PesquisaItem
+		[CONTROLE]consumer=[#Step no BPM na qual a tarefa inicial se encontra] ; =PesquisaItem

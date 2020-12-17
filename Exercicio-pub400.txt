@@ -1,0 +1,181 @@
+**************************************************************************************************************
+**************************************************************************************************************
+Duplas:
+**************************************************************************************************************
+**************************************************************************************************************
+	1-
+	Felipe Roque
+	Luca Milla
+
+	2-
+	Luccas Camilo
+	Messias
+
+	3-
+	Thiagos
+
+
+**************************************************************************************************************
+**************************************************************************************************************
+Como mexer no TN5250j
+**************************************************************************************************************
+**************************************************************************************************************
+
+	strpdm
+	<enter>
+	3. Work with members
+
+	'Specify Members to Work With'
+	File:        QCPPSRC
+
+	Criar:
+	    F6
+	    Source Member: Nome do Membro
+	    <enter>
+	    Beginning of data, preencher com a string
+	    <enter>
+	    f3
+	    <enter> ; Salvar
+
+
+	Modificar:
+	    Alternativa 1:
+	        Digitar a opcao "2" no membro que queira editar
+	        Fazer o Edit
+	        <enter>
+	        F3
+	        <enter> ;salvar
+
+	    Alternativa 2: 
+	        Dica: F9! Prompt! talvez seja mais facil?
+
+	Remover:
+	    Alternativa 1:
+	        Digitar a opcao "4" no membro que queira editar
+	        Confirmar se é quem eu quero deletar
+	        <enter> ; confirma
+	        <f12> ; anula
+
+	    Alternativa 2: 
+	        Dica: F9! Prompt! talvez seja mais facil?
+
+	Copy:
+	    Alternativa 1:
+	        Digitar a opcao "3" no membro que queira editar
+	        digitar o nome da copia
+	        <enter>
+
+	    Alternativa 2: 
+	        Dica: F9! Prompt! talvez seja mais facil?
+
+
+
+**************************************************************************************************************
+**************************************************************************************************************
+Arquitetura do Robô:
+**************************************************************************************************************
+**************************************************************************************************************
+
+	Producer:
+		[EXCEL]
+
+	    Excel de Entrada com 03 colunas
+	        {NOME, COMANDO, PARAMETRO}
+
+	        NOME : 1-7 caracteres
+	        COMANDO : [Adicionar, Modificar, Remover, Copiar]
+	        PARAMETRO :
+	        	Se ADICIONAR: O que irá no campo `data` no `IBM i`.
+	        	Se MODIFICAR: O que irá no campo `data` no `IBM i`.
+	            Se REMOVER: Não precisa.
+	            Se COPIAR: Nome da cópia.
+
+
+	    Pseudocodigo AHK
+
+	    ; SubirTarefas.ahk
+	    SubirTarefas() {
+
+	   		nome_arquivo_excel := ....
+	    	InsertVariablesProcess("nome_planilha", nome_arquivo_excel)
+	    	; Esta insere para si mesmo - na tarefa que está rodando
+
+	    	Loop % Excel {
+
+	    		nome := coluna1
+	    		comando := coluna2
+	    		parametro := coluna3
+
+	    		InsertVariablesMultiProducer("nome", nome)
+	    		; Esta insere no "balde" que criará uma tarefa no consumer
+
+	    		InsertVariablesMultiProducer("comando", comando)
+	    		InsertVariablesMultiProducer("parametro", parametro)
+	    		InsertVariablesMultiProducer("nome_planilha", nome_arquivo_excel)
+
+	    		StartMultiProducer()
+	    	}
+	    }
+
+
+	Consumer:
+		[TN5250]
+	    1. Abrir Aplicativo 
+	    2. Fazer Login
+
+	    # PesquisaItem (em outras palavras, primeiro step pós-PreparaAmbiente)
+	       3. Validar se o dado que veio é suficiente/correto
+
+	    4. Acessar a(s) tela(s)
+	    5. Realizar as tarefas/modificações
+	    6. Reportar para Dashboard
+
+
+	    Pseudocodigo AHK
+
+	    ; PesquisaItem.ahk
+	    PesquisaItem() {
+	    	nome := GetVariableValueProcess("nome")
+	    	comando := GetVariableValueProcess("comando")
+	    	parametro := GetVariableValueProcess("parametro")
+
+	    	if (nome == "NOT FOUND" or comando := "NOT FOUND" or parametro = "NOT FOUND" ) {
+	    		iamlost("tchau tarefa")
+	    	}
+	    }
+
+	    if DeuErro:
+	    	InsertVariablesProcess("mensagem_detectada_de_erro", mensagem_erro)
+	    	iDontKnow("Tela não mapeada senhor.")
+
+
+
+	Inline:
+		Inline pode rodar offline ([CONTROLE]raceMode=training)
+
+		[EXCEL]
+		Pega a primeira linha nao-feita
+
+		[TN5250J]
+		Faz as atividades
+
+		[EXCEL]
+		Escreve o resultado da linha, se reinicia.
+
+	Config.ini (+info, slide 25 treinamento_inicial.pptx)
+	    EM AMBOS
+	    [CONTROLE]nomeProcesso
+	    [CONEXAO]ipBrainDev, ipBpmDev
+	    [CONTROLE]raceMode=racing ; racing=Online, training=Offline
+	    [CONTROLE]userId, passwordId ; necessário se estiver raceMode=racing
+
+	    PRODUCER
+	        [CONTROLE]mode=producer
+	        [CONTROLE]multiProducerTo=[DiagramaDoConsumer] ; =PortoSeguroGeradorCobrancaDeMultasRepique
+	        [CONTROLE]multiProducer=[#1 Step do Alvo] ; =PesquisaItem
+	        
+
+	    CONSUMER
+	        [CONTROLE]mode=consumer
+	        [CONTROLE]steps=[#Step no BPM na qual a tarefa inicial se encontra] ; =PesquisaItem
+	        [CONTROLE]consumer=[#Step no BPM na qual a tarefa inicial se encontra] ; =PesquisaItem
