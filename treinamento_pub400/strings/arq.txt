@@ -1,4 +1,4 @@
- IBM i 
+ MAIN                           IBM i Main Menu                                 
                                                              System:   PUB400   
  Select one of the following:                                                   
                                                                                 

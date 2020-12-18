@@ -2,9 +2,9 @@ FileRead, texto, C:\TreinamentoBPA\EXERCICIO_FIS_SIMULATOR\treinamento_pub400\st
 
 word_array := StrSplit(texto, A_Space, ".")
 
-palavra_menu_da_tela := word_array[4] 
+palavra_menu_da_tela := word_array[10]
 
-palavra_tela_desejada := "Menu"
+palavra_tela_desejada := "Welcome"
 
 MsgBox, % texto
 MsgBox % palavra_menu_da_tela

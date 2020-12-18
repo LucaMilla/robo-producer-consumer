@@ -24,11 +24,8 @@ PesquisaItem(){
 
 		nome := "Lucca"
 		comando := ["Adicionar", "Modificar", "Remover","Copiar"]
-		parametro := ["data", "data", "", "copia"]
-		
-		;~ CRIAR
-		
-		
+		parametro := ["data", "data", "", ""]
+
 		;~ if (nome == "NOT FOUND" or comando := "NOT FOUND" or parametro = "NOT FOUND" ) {
 	    	;~ iamlost("tchau tarefa")
 	    ;~ }

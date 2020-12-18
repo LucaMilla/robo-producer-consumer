@@ -2,7 +2,6 @@
 	;~ ultraDebug("Step [[ PreparaAmbiente ]]")
 	
 	try {
-		
 		AbrirApp()
 		Sleep, 5000
 
@@ -27,10 +26,11 @@
 		;~ Fecha notepad e salva
 		WinClose, ahk_class Notepad
 		Send, {Enter}
-
+		Sleep, 500
 		FileRead, texto, C:\TreinamentoBPA\EXERCICIO_FIS_SIMULATOR\treinamento_pub400\strings\arq.txt
-
-		ValidaTela(texto, "Welcome")
+		if (ValidaTelaLogin(texto) == False) {
+			ExitApp
+		}
 
 		username := ["F", "E", "H", "R", "O", "Q", "U", "E"]
 		passw := ["s", "e", "n", "h", "a", "1", "2", "3"]
@@ -38,8 +38,9 @@
 		Sleep, 500
 		;~ Recebe 2 listas e cada uma recebe cada tecla que precisará ser digitada
 		FazLogin(username, passw)
-		Sleep, 1000
+		Sleep, 3000
 
+		;~ Sleep, 1000
 		;~ Copia a Tela
 		MouseClickDrag, L, 12, 65, 1367, 727, 0
 		Send ^c
@@ -64,15 +65,9 @@
 
 		FileRead, texto, C:\TreinamentoBPA\EXERCICIO_FIS_SIMULATOR\treinamento_pub400\strings\arq.txt
 
-		ValidaTela(texto, "Main")
-		;~ Sleep, 100
-		;~ Send, {s}{t}{r}{p}{d}{m}
-		;~ Send, {Enter}
-		;~ Send, {3}
-		;~ Send, {Enter}
-		;~ Send, {Q}{C}{P}{P}{S}{R}{C}
-		;~ Send, {Enter} 
-
+		if (ValidaTelaMenu(texto) == False){
+			ExitApp
+		}
 	} catch e {
 		;~ iAmBroked("Quebrei no PreparaAmbiente. Erro Desconhecido", e)
 	}
@@ -118,9 +113,35 @@ FazLogin(username, passw){
 		
 	;~ entra
 	Send, {ENTER}
+	Sleep, 500
 }
 
-ValidaTela(texto_da_tela, tela_desejada){
+ValidaTelaLogin(texto){
+	word_array := StrSplit(texto, A_Space, ".")
 
-	return
+	pos_palavra_welcome_da_tela := word_array[10]
+
+	palavra_desejada := "Welcome"
+
+	If InStr(pos_palavra_welcome_da_tela, palavra_desejada)
+	{
+		return True
+	} else {
+		MsgBox, % "não está na tela de login"
+		return False
+	}
+}
+
+ValidaTelaMenu(texto){
+	word_array := StrSplit(texto, A_Space, ".")
+	pos_palavra_menu_da_tela := word_array[32]
+	palavra_desejada := "Menu"
+
+	If InStr(pos_palavra_menu_da_tela, palavra_desejada)
+	{
+		return True
+	} else {
+		MsgBox, % "não está na tela de login"
+		return False
+	}
 }
